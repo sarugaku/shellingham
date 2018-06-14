@@ -1,0 +1,7 @@
+[packages]
+shellingham = { path = ".", editable = true }
+
+[dev-packages]
+invoke = "*"
+towncrier = "*"
+wheel = "*"
