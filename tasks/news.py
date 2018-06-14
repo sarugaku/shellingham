@@ -22,8 +22,10 @@ def get_random():
     return str(uuid.uuid4())[:8]
 
 
-@invoke.task
-def add(ctx, description, type_='feature', issue=None):
+@invoke.task()
+def add(ctx, description, type_, issue=None):
+    """Create a news entry.
+    """
     toml_file = get_toml_file(ctx)
     tf = toml.load(toml_file.as_posix())
     allowed_types = tf.get('tool', {}).get('towncrier', {}).get('type', [])
@@ -60,10 +62,10 @@ def add(ctx, description, type_='feature', issue=None):
 
 @invoke.task
 def generate(ctx, draft=False):
+    """Generate NEWS from fragments.
+    """
     print("[news.generate] Generating NEWS")
-
     args = []
     if draft:
         args.append("--draft")
-
     ctx.run("towncrier {}".format(" ".join(args)))
