@@ -1,2 +1,0 @@
-Prevent the lookup from exploding when running in non-hierarchical process
-structure.
