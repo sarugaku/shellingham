@@ -10,7 +10,7 @@ VERSION = None
 with open(os.path.join(ROOT, 'src', 'shellingham', '__init__.py')) as f:
     for line in f:
         if line.startswith('__version__ = '):
-            VERSION = ast.literal_eval(line[len('__version__ = '):])
+            VERSION = ast.literal_eval(line[len('__version__ = '):]).strip()
 if VERSION is None:
     raise EnvironmentError('failed to read version')
 
