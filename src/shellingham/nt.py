@@ -128,4 +128,7 @@ def get_shell(pid=None, max_depth=6):
     shell_name = _get_executable(processes.get(pid))
     if shell_name in SHELL_NAMES:
         return (shell_name, processes[pid]['executable'])
-    return check_parent(pid)
+    try:
+        return check_parent(pid)
+    except KeyError:
+        return None
