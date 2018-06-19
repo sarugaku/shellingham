@@ -1,3 +1,14 @@
+1.1.0 (2018-06-19)
+==================
+
+Features
+--------
+
+- Use ``/proc`` on Linux to build process tree. This is more reliable than
+  ``ps``, which may not be available on a bare installation.  `#3
+  <https://github.com/sarugaku/shellingham/issues/3>`_
+
+
 1.0.1 (2018-06-19)
 ==================
 
