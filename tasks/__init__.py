@@ -94,9 +94,8 @@ def release(ctx, type_, repo):
     tag_content = _render_log()
 
     ctx.run('towncrier')
-    ctx.run('git add .')
 
-    ctx.run(f'git commit -m "Release {version}"')
+    ctx.run(f'git commit -am "Release {version}"')
 
     tag_content = tag_content.replace('"', '\\"')
     ctx.run(f'git tag -a {version} -m "Version {version}\n\n{tag_content}"')
@@ -117,3 +116,5 @@ def release(ctx, type_, repo):
 
     version = _bump_dev(version)
     _write_version(version)
+
+    ctx.run(f'git commit -am "Prebump to {version}"')
