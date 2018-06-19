@@ -1,5 +1,6 @@
 import collections
 import os
+import platform
 import shlex
 import subprocess
 import sys
@@ -30,11 +31,36 @@ def _get_process_mapping():
     return processes
 
 
+def _linux_get_process_mapping():
+    """Try to look up the process tree via linux's /proc"""
+    STAT_PPID = 3
+    STAT_TTY = 6
+    with open('/proc/%s/stat' % os.getpid()) as f:
+        self_tty = f.read().split()[STAT_TTY]
+    pids = [pid for pid in os.listdir('/proc') if pid.isdigit()]
+    processes = {}
+    for pid in pids:
+        try:
+            with open('/proc/%s/stat' % pid) as fstat, open('/proc/%s/cmdline' % pid) as fcmdline:
+                stat = fstat.read().split()
+                cmd = fcmdline.read()[:-1]
+            ppid = stat[STAT_PPID]
+            tty = stat[STAT_TTY]
+            if tty == self_tty:
+                processes[pid] = Process(
+                    args=tuple(shlex.split(cmd)), pid=pid, ppid=ppid,
+                )
+        except IOError:
+            # process has disappeared - just ignore it
+            pass
+    return processes
+
+
 def get_shell(pid=None, max_depth=6):
     """Get the shell that the supplied pid or os.getpid() is running in.
     """
     pid = str(pid or os.getpid())
-    mapping = _get_process_mapping()
+    mapping = _linux_get_process_mapping() if platform.system() == 'Linux' else _get_process_mapping()
     login_shell = os.environ.get('SHELL', '')
     for _ in range(max_depth):
         try:
