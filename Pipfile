@@ -3,5 +3,6 @@ shellingham = { path = ".", editable = true }
 
 [dev-packages]
 invoke = "*"
+parver = "*"
 towncrier = "*"
 wheel = "*"
