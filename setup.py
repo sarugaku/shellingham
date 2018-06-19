@@ -10,7 +10,8 @@ VERSION = None
 with open(os.path.join(ROOT, 'src', 'shellingham', '__init__.py')) as f:
     for line in f:
         if line.startswith('__version__ = '):
-            VERSION = ast.literal_eval(line[len('__version__ = '):])
+            VERSION = ast.literal_eval(line[len('__version__ = '):].strip())
+            break
 if VERSION is None:
     raise EnvironmentError('failed to read version')
 
@@ -23,7 +24,7 @@ setup(
 
     # I don't know how to specify an empty key in setup.cfg.
     package_data={
-        '': ['version.txt', 'LICENSE*', 'README*'],
+        '': ['LICENSE*', 'README*'],
     },
 
     # I need this to be dynamic.
