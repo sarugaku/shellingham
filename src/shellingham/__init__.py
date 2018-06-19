@@ -2,7 +2,7 @@ import importlib
 import os
 
 
-__version__ = '1.1.0'
+__version__ = '1.1.0.dev0'
 
 
 class ShellDetectionFailure(EnvironmentError):
