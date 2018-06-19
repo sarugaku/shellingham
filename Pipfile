@@ -1,8 +1,11 @@
 [packages]
-shellingham = { path = ".", editable = true }
+shellingham = { path = '.', editable = true }
 
 [dev-packages]
-invoke = "*"
-parver = "*"
-towncrier = "*"
-wheel = "*"
+invoke = '*'
+parver = '*'
+towncrier = '*'
+wheel = '*'
+
+[scripts]
+release = 'inv release'
