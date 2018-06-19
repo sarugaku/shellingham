@@ -1,6 +1,7 @@
 import collections
 import os
 import platform
+import re
 import shlex
 import subprocess
 import sys
@@ -42,13 +43,13 @@ def _linux_get_process_mapping():
     for pid in pids:
         try:
             with open('/proc/%s/stat' % pid) as fstat, open('/proc/%s/cmdline' % pid) as fcmdline:
-                stat = fstat.read().split()
-                cmd = fcmdline.read()[:-1]
+                stat = re.findall('\(.+\)|\S+', fstat.read())
+                cmd = fcmdline.read().split('\x00')[:-1]
             ppid = stat[STAT_PPID]
             tty = stat[STAT_TTY]
             if tty == self_tty:
                 processes[pid] = Process(
-                    args=tuple(shlex.split(cmd)), pid=pid, ppid=ppid,
+                    args=tuple(cmd), pid=pid, ppid=ppid,
                 )
         except IOError:
             # process has disappeared - just ignore it
