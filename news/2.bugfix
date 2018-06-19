@@ -1,1 +1,0 @@
-Fix POSIX usage on Python 2 by providing more compatible arguments to parse ``ps`` results. Thanks to @glehmann for the patch.
