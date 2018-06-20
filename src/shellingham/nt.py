@@ -112,6 +112,15 @@ def _get_executable(process_dict):
 def get_shell(pid=None, max_depth=6):
     """Get the shell that the supplied pid or os.getpid() is running in.
     """
+    # This handles git bash for windows which runs winpty -> python
+    # but sets the SHELL environment variable to the bash.exe subshell
+    shell_from_env = os.environ.get('SHELL')
+    if shell_from_env and os.path.exists(shell_from_env):
+        shell_exe = os.path.basename(shell_from_env)
+        shell_name = os.path.splitext(shell_exe)[0]
+        if shell_name in SHELL_NAMES:
+            return(shell_name, shell_exe)
+
     if not pid:
         pid = os.getpid()
     processes = get_all_processes()
