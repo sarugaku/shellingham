@@ -4,6 +4,8 @@ shellingham = { path = '.', editable = true }
 [dev-packages]
 invoke = '*'
 parver = '*'
+pytest = '*'
+pytest-mock = '*'
 towncrier = '*'
 wheel = '*'
 
