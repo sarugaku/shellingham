@@ -9,7 +9,8 @@ def _get_process_mapping():
     * `/proc` is used if supported.
     * The system `ps` utility is used as a fallback option.
     """
-    if os.path.isdir('/proc'):
+    if os.path.isdir('/proc') and os.listdir('/proc'):
+        # Need to check if /proc contains stuff. It might not be mounted.
         from . import _proc as impl
     else:
         from . import _ps as impl
