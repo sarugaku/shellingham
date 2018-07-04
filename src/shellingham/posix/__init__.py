@@ -1,15 +1,18 @@
 import os
-import platform
 
 from .._consts import SHELL_NAMES
 
 
 def _get_process_mapping():
-    system = platform.system()
-    if system == 'Linux':
-        from . import linux as impl
+    """Select a way to obtain process information from the system.
+
+    * `/proc` is used if supported.
+    * The system `ps` utility is used as a fallback option.
+    """
+    if os.path.isdir('/proc'):
+        from . import _proc as impl
     else:
-        from . import _default as impl
+        from . import _ps as impl
     return impl.get_process_mapping()
 
 
