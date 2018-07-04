@@ -1,3 +1,13 @@
+1.2.1 (2018-07-04)
+==================
+
+Bug Fixes
+---------
+
+- Fix login shell detection if it is ``chsh``-ed to point to an absolute path.
+  `#6 <https://github.com/sarugaku/shellingham/issues/6>`_
+
+
 1.2.0 (2018-07-04)
 ==================
 
