@@ -86,6 +86,8 @@ def _bump_dev(version):
 
 @invoke.task(pre=[clean])
 def release(ctx, type_, repo):
+    """Make a new release.
+    """
     version = parver.Version.parse(_read_version()).normalize()
     version = _bump_release(version, type_)
     _write_version(version)
