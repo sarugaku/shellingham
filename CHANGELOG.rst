@@ -1,3 +1,13 @@
+1.2.0 (2018-07-04)
+==================
+
+Features
+--------
+
+- Prefer the ``/proc``-based approach on POSIX whenever it is likely to work.
+  `#5 <https://github.com/sarugaku/shellingham/issues/5>`_
+
+
 1.1.0 (2018-06-19)
 ==================
 
