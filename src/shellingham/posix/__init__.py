@@ -1,6 +1,7 @@
 import os
 
-from .._consts import SHELL_NAMES
+from .._core import SHELL_NAMES, ShellDetectionFailure
+from . import proc, ps
 
 
 def _get_process_mapping():
@@ -9,12 +10,13 @@ def _get_process_mapping():
     * `/proc` is used if supported.
     * The system `ps` utility is used as a fallback option.
     """
-    if os.path.isdir('/proc') and os.listdir('/proc'):
-        # Need to check if /proc contains stuff. It might not be mounted.
-        from . import _proc as impl
-    else:
-        from . import _ps as impl
-    return impl.get_process_mapping()
+    for impl in (proc, ps):
+        try:
+            mapping = impl.get_process_mapping()
+        except EnvironmentError:
+            continue
+        return mapping
+    raise ShellDetectionFailure('compatible proc fs or ps utility is required')
 
 
 def _get_login_shell(proc_cmd):

@@ -1,3 +1,4 @@
+import errno
 import shlex
 import subprocess
 import sys
@@ -5,12 +6,21 @@ import sys
 from ._core import Process
 
 
+class PsNotAvailable(EnvironmentError):
+    pass
+
+
 def get_process_mapping():
     """Try to look up the process tree via the output of `ps`.
     """
-    output = subprocess.check_output([
-        'ps', '-ww', '-o', 'pid=', '-o', 'ppid=', '-o', 'args=',
-    ])
+    try:
+        output = subprocess.check_output([
+            'ps', '-ww', '-o', 'pid=', '-o', 'ppid=', '-o', 'args=',
+        ])
+    except OSError as e:    # Python 2-compatible FileNotFoundError.
+        if e.errno != errno.ENOENT:
+            raise
+        raise PsNotAvailable('ps not found')
     if not isinstance(output, str):
         output = output.decode(sys.stdout.encoding)
     processes = {}
