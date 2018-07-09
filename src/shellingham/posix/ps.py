@@ -22,7 +22,8 @@ def get_process_mapping():
             raise
         raise PsNotAvailable('ps not found')
     if not isinstance(output, str):
-        output = output.decode(sys.stdout.encoding)
+        encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
+        output = output.decode(encoding)
     processes = {}
     for line in output.split('\n'):
         try:
