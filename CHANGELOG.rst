@@ -1,3 +1,20 @@
+1.2.2 (2018-07-09)
+==================
+
+Features
+--------
+
+- Support BSD-style ``/proc`` format.  `#4
+  <https://github.com/sarugaku/shellingham/issues/4>`_
+
+
+Bug Fixes
+---------
+
+- Better ``ps`` output decoding to fix compatibility.  `#7
+  <https://github.com/sarugaku/shellingham/issues/7>`_
+
+
 1.2.1 (2018-07-04)
 ==================
 
