@@ -25,7 +25,7 @@ def _iter_process_command(mapping, pid, max_depth):
     for _ in range(max_depth):
         try:
             proc = mapping[pid]
-        except KeyError:    # We've reach the root process. Give up.
+        except KeyError:    # We've reached the root process. Give up.
             break
         try:
             cmd = proc.args[0]
