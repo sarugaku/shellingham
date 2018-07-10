@@ -1,3 +1,14 @@
+1.2.3 (2018-07-10)
+=======================
+
+Bug Fixes
+---------
+
+- Check a process’s argument list is valid before peeking into it. This works
+  around a Heisenbug in VS Code, where a process read from ``/proc`` may
+  contain an empty argument list.
+
+
 1.2.2 (2018-07-09)
 ==================
 
