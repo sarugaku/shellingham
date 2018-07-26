@@ -48,11 +48,12 @@ def _iter_process():
 
         >>> for pid, info in _iter_process():
         ...     print(pid, '->', info)
-        1509 -> {
-            'parent_pid': 1201,
-            'executable': 'C:\\Program\\\\ Files\\Python36\\python.exe'
-        }
+        1509 -> {'parent_pid': 1201, 'executable': 'python.exe'}
     """
+    # TODO: Process32{First,Next} does not return full executable path, only
+    # the name. To get the full path, Module32{First,Next} is needed, but that
+    # does not contain parent process information. We probably need to call
+    # BOTH to build the correct process tree.
     h_process = windll.kernel32.CreateToolhelp32Snapshot(
         2,  # dwFlags=TH32CS_SNAPPROCESS (include all processes).
         0,  # th32ProcessID=0 (the current process).
