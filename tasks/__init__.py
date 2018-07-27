@@ -78,8 +78,18 @@ def _bump_release(version, type_):
     return next_version
 
 
-def _bump_dev(version):
-    next_version = version.bump_dev()
+PREBUMP = 'patch'
+
+
+def _unprebump(version):
+    release = list(version.release)
+    release[REL_TYPES.index(PREBUMP)] -= 1
+    release = tuple(release)
+    version.base_version().clear(dev=True).replace(release=release)
+
+
+def _prebump(version):
+    next_version = version.bump_release(PREBUMP).bump_dev()
     print(f'[bump] {version} -> {next_version}')
     return next_version
 
@@ -88,7 +98,7 @@ def _bump_dev(version):
 def release(ctx, type_, repo):
     """Make a new release.
     """
-    version = parver.Version.parse(_read_version()).normalize()
+    version = _unprebump(parver.Version.parse(_read_version()).normalize())
     version = _bump_release(version, type_)
     _write_version(version)
 
@@ -116,7 +126,7 @@ def release(ctx, type_, repo):
     arg_display = ' '.join(f'"{n}"' for n in artifacts)
     ctx.run(f'twine upload --repository="{repo}" {arg_display}')
 
-    version = _bump_dev(version)
+    version = _prebump(version)
     _write_version(version)
 
     ctx.run(f'git commit -am "Prebump to {version}"')
