@@ -79,7 +79,7 @@ def _bump_release(version, type_):
     return next_version
 
 
-PREBUMP = 'patch'
+PREBUMP = 2     # Default to next patch number.
 
 
 def _prebump(version):
