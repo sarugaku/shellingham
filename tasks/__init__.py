@@ -43,7 +43,8 @@ def _write_version(v):
             if line.startswith('__version__ = '):
                 line = f'__version__ = {repr(str(v))}\n'
             lines.append(line)
-    INIT_PY.write_text(''.join(lines))
+    with INIT_PY.open('w', newline='\n') as f:
+        f.write(''.join(lines))
 
 
 def _render_log():
