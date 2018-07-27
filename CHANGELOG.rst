@@ -1,3 +1,15 @@
+1.2.4 (2018-07-27)
+==================
+
+Bug Fixes
+---------
+
+- Fix exception on Windows when the executable path is too long to fit into the
+  PROCESSENTRY32 struct. Generally the shell shouldn't be buried this deep, and
+  we can always fix it when that actually happens, if ever.  `#8
+  <https://github.com/sarugaku/shellingham/issues/8>`_
+
+
 1.2.3 (2018-07-10)
 =======================
 

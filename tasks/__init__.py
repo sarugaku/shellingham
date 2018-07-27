@@ -1,6 +1,7 @@
 import ast
 import pathlib
 import shutil
+import subprocess
 
 import invoke
 import parver
@@ -28,11 +29,11 @@ def clean(ctx):
 
 
 def _read_version():
-    with INIT_PY.open() as f:
-        for line in f:
-            if line.startswith('__version__ = '):
-                return ast.literal_eval(line[len('__version__ = '):].strip())
-    raise EnvironmentError('failed to read version')
+    out = subprocess.check_output(['git', 'tag'], encoding='ascii')
+    version = max(parver.Version.parse(v).normalize() for v in (
+        line.strip() for line in out.split('\n')
+    ) if v)
+    return version
 
 
 def _write_version(v):
@@ -81,13 +82,6 @@ def _bump_release(version, type_):
 PREBUMP = 'patch'
 
 
-def _unprebump(version):
-    release = list(version.release)
-    release[REL_TYPES.index(PREBUMP)] -= 1
-    release = tuple(release)
-    version.base_version().clear(dev=True).replace(release=release)
-
-
 def _prebump(version):
     next_version = version.bump_release(PREBUMP).bump_dev()
     print(f'[bump] {version} -> {next_version}')
@@ -98,7 +92,7 @@ def _prebump(version):
 def release(ctx, type_, repo):
     """Make a new release.
     """
-    version = _unprebump(parver.Version.parse(_read_version()).normalize())
+    version = _read_version()
     version = _bump_release(version, type_)
     _write_version(version)
 
