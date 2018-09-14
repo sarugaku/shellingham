@@ -1,0 +1,1 @@
+Improve ``/proc`` content parsing robustness to not fail with non-decodable command line arguments.
