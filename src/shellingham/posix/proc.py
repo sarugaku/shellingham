@@ -44,7 +44,7 @@ def _get_cmdline(pid):
         # necessarily decodable. For Shellingham's purpose, however, we don't
         # care. (pypa/pipenv#2820)
         # cmdline appends an extra NULL at the end, hence the [:-1].
-        return tuple(f.read().split(b'\0')[:-1])
+        return tuple(f.read().split('\0')[:-1])
 
 
 class ProcFormatError(EnvironmentError):
