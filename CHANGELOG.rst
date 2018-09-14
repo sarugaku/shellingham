@@ -1,3 +1,14 @@
+1.2.5 (2018-09-14)
+==================
+
+Bug Fixes
+---------
+
+- Improve ``/proc`` content parsing robustness to not fail with non-decodable
+  command line arguments.  `#10
+  <https://github.com/sarugaku/shellingham/issues/10>`_
+
+
 1.2.4 (2018-07-27)
 ==================
 
