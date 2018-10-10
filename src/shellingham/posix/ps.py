@@ -28,9 +28,9 @@ def get_process_mapping():
     for line in output.split('\n'):
         try:
             pid, ppid, args = line.strip().split(None, 2)
+            processes[pid] = Process(
+                args=tuple(shlex.split(args)), pid=pid, ppid=ppid,
+            )
         except ValueError:
             continue
-        processes[pid] = Process(
-            args=tuple(shlex.split(args)), pid=pid, ppid=ppid,
-        )
     return processes
