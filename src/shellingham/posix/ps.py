@@ -21,6 +21,12 @@ def get_process_mapping():
         if e.errno != errno.ENOENT:
             raise
         raise PsNotAvailable('ps not found')
+    except subprocess.CalledProcessError as e:
+        # `ps` can return 1 if the process list is completely empty.
+        # (sarugaku/shellingham#15)
+        if not e.output.strip():
+            return {}
+        raise
     if not isinstance(output, str):
         encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
         output = output.decode(encoding)
