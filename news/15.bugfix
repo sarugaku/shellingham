@@ -1,1 +1,0 @@
-Suppress subprocess errors from ``ps`` if the output is empty.

@@ -1,3 +1,13 @@
+1.2.7 (2018-10-15)
+==================
+
+Bug Fixes
+---------
+
+- Suppress subprocess errors from ``ps`` if the output is empty.  `#15
+  <https://github.com/sarugaku/shellingham/issues/15>`_
+
+
 1.2.6 (2018-09-14)
 ==================
 
