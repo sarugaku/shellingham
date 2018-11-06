@@ -16,7 +16,9 @@ def _get_process_mapping():
         except EnvironmentError:
             continue
         return mapping
-    raise ShellDetectionFailure('compatible proc fs or ps utility is required')
+    raise ShellDetectionFailure(
+        'compatible proc fs, libkvm, or ps utility is required',
+    )
 
 
 def _iter_process_command(mapping, pid, max_depth):
