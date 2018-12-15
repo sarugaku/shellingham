@@ -1,1 +1,0 @@
-Parse ``ps`` output according to how it is actually formatted, instead of incorrectly using ``shlex.split()``.

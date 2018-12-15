@@ -1,3 +1,17 @@
+1.2.8 (2018-12-16)
+==================
+
+Bug Fixes
+---------
+
+- Parse ``ps`` output according to how it is actually formatted, instead of
+  incorrectly using ``shlex.split()``.  `#14
+  <https://github.com/sarugaku/shellingham/issues/14>`_
+
+- Improve process parsing on Windows to so executables with non-ASCII names are
+  handled better.  `#16 <https://github.com/sarugaku/shellingham/issues/16>`_
+
+
 1.2.7 (2018-10-15)
 ==================
 
