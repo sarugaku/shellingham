@@ -2,6 +2,9 @@
 Shellingham: Tool to Detect Surrounding Shell
 =============================================
 
+.. image:: https://img.shields.io/pypi/v/shellingham.svg
+    :target: https://pypi.org/project/shellingham/
+
 Shellingham detects what shell the current Python executable is running in.
 
 
