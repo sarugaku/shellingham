@@ -40,7 +40,7 @@ Notes
 Notes for Application Developers
 ================================
 
-Remember, users of your application is not necessarily using a shell.
+Remember, your application's user is not necessarily using a shell.
 Shellingham raises ``ShellDetectionFailure`` if there is no shell to detect,
 but *your application should almost never do this to your user*.
 
@@ -52,16 +52,18 @@ provide a sane default on failure::
     except shellingham.ShellDetectionFailure:
         shell = provide_default()
 
-There are a few choices for you to choose as defaults.
+There are a few choices for you to choose from.
 
 * The POSIX standard mandates the environment variable ``SHELL`` to refer to
   "the user's preferred command language interpreter". This is always available
   (even if the user is not in an interactive session), and likely the correct
   choice to launch an interactive sub-shell with.
-* Several POSIX utilities rely on the existence of ``/bin/sh``. This should be
-  suitable if you want to run a (possibly non-interactive) script.
+* A command ``sh`` is almost guarenteed to exist, likely at ``/bin/sh``, since
+  several POSIX tools rely on it. This should be suitable if you want to run a
+  (possibly non-interactive) script.
 * All versions of DOS and Windows have an environment variable ``COMSPEC``.
-  This is always a usable command prompt (`cmd.exe` on Windows).
+  This can always be used to launch a usable command prompt (e.g. `cmd.exe` on
+  Windows).
 
 Here's a simple implementation to provide a default shell::
 
