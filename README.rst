@@ -26,9 +26,50 @@ what shell it is run in. It returns a 2-tuple:
 ``ShellDetectionFailure`` is raised if ``detect_shell`` fails to detect the
 surrounding shell.
 
+
 Notes
 =====
 
 * The shell name is always lowercased.
-* On Windows, the shell name is the name of the executable, minus the file exetension.
-* Currently the command only contains the executable name on Windows, even if the command is invoked by the full path. This may change in the future.
+* On Windows, the shell name is the name of the executable, minus the file
+  exetension.
+* Currently the command only contains the executable name on Windows, even if
+  the command is invoked by the full path. This may change in the future.
+
+
+Notes for Application Developers
+================================
+
+Remember, users of your application is not necessarily using a shell.
+Shellingham raises ``ShellDetectionFailure`` if there is no shell to detect,
+but *your application should almost never do this to your user*.
+
+A practical approach to this is to wrap ``detect_shell`` in a try block, and
+provide a sane default on failure::
+
+    try:
+        shell = shellingham.detect_shell()
+    except shellingham.ShellDetectionFailure:
+        shell = provide_default()
+
+There are a few choices for you to choose as defaults.
+
+* The POSIX standard mandates the environment variable ``SHELL`` to refer to
+  "the user's preferred command language interpreter". This is always available
+  (even if the user is not in an interactive session), and likely the correct
+  choice to launch an interactive sub-shell with.
+* Several POSIX utilities rely on the existence of ``/bin/sh``. This should be
+  suitable if you want to run a (possibly non-interactive) script.
+* All versions of DOS and Windows have an environment variable ``COMSPEC``.
+  This is always a usable command prompt (`cmd.exe` on Windows).
+
+Here's a simple implementation to provide a default shell::
+
+    import os
+
+    def provide_default():
+        if os.name == 'posix':
+            return os.environ['SHELL']
+        elif os.name == 'nt':
+            return os.environ['COMSPEC']
+        raise NotImplementedError(f'OS {os.name!r} support not available')
