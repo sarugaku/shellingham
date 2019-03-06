@@ -1,0 +1,1 @@
+Add `Almquist shell <https://en.wikipedia.org/wiki/Almquist_shell>`__ (``ash``) detection support.
