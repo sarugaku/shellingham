@@ -1,3 +1,14 @@
+1.3.0 (2019-03-06)
+==================
+
+Features
+--------
+
+- Add `Almquist shell <https://en.wikipedia.org/wiki/Almquist_shell>`_
+  (``ash``) detection support.  `#20
+  <https://github.com/sarugaku/shellingham/issues/20>`_
+
+
 1.2.8 (2018-12-16)
 ==================
 
