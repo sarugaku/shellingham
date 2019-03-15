@@ -1,0 +1,3 @@
+Switch to parse ``ps wwl`` for better compatibility. This adds support to more
+old-fashined UNIX boxes such as IBM AIX, while keeping things working on newer
+Linux and BSD versions.
