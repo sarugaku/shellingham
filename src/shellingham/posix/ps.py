@@ -25,6 +25,12 @@ else:   # Old Python versions don't support the stderr argument.
 
 
 def _get_ps_output():
+    """Call `ps` and returns its output as text.
+
+    Raises `subprocess.CalledProcessError` or `FileNotFoundError` if the `ps`
+    call fails. The output is decoded by the most reasonable system encoding
+    available.
+    """
     cmd = ['ps', 'wwl']
     try:
         proc = subprocess.Popen(
@@ -56,6 +62,12 @@ def _get_ps_output():
 
 
 def _parse_ps_header(header):
+    """Parse the header row of the `ps` output and yield column information.
+
+    Each yield sends a 2-tuple `(name, slice)`. `name` is the name of the
+    column (generally in ALLCAPS); `slice` is a slice object that can be used
+    to slice the given column out of a row (spaces included).
+    """
     start = 0
     colchs = []
     for i, c in enumerate(header):
@@ -70,6 +82,12 @@ def _parse_ps_header(header):
 
 
 def _parse_ps_output(output):
+    """Parse the `ps` output and yield information from each row.
+
+    The header row is first parsed for column information, and each subsequent
+    row parsed to get information we want. Each yields sends a 2-tuple
+    `(pid, process)`.
+    """
     lines_iter = iter(output.split('\n'))
     try:
         header = next(lines_iter)
