@@ -1,3 +1,4 @@
+import collections
 import errno
 import inspect
 import subprocess
@@ -93,13 +94,23 @@ def _parse_ps_output(output):
         header = next(lines_iter)
     except StopIteration:
         return
-    columns = {k.lower(): v for k, v in _parse_ps_header(header)}
+    columns = collections.OrderedDict(
+        (k.lower(), v)
+        for k, v in _parse_ps_header(header)
+    )
     for line in lines_iter:
-        pid, ppid, args = (
-            line[columns[k]].strip()
-            for k in ('pid', 'ppid', 'command')
-        )
-        # XXX: This is not right, but we are really out of options.
+        pid, ppid = (line[columns[k]].strip() for k in ('pid', 'ppid'))
+        if not (pid and ppid):
+            continue
+
+        # The arguments column has different names in various implementations,
+        # but it is always the last.
+        last_col = next(reversed(columns.values()))
+        if len(line) <= last_col.start:
+            continue
+        args = line[last_col].strip()
+
+        # XXX: This is technolocally wrong, but we are really out of options.
         # ps does not offer a sane way to decode the argument display,
         # and this is "Good Enough" for obtaining shell names. Hopefully
         # people don't name their shell with a space, or have something
