@@ -29,9 +29,15 @@ PS_OUTPUTS = [
  501 82557 82556   0  31  0  4296844   1260 -      S+   s002    0:00.43 -bash
     """,    # noqa
     """\
-     F S      UID    PID   PPID   C PRI NI ADDR  SZ  RSS   WCHAN    TTY   TIME CMD
-240000 A      105 897903 897902   0  20 20    0 7124    0          pts/0  0:00 -bash
-200000 A      105 897904 897903   0  20 20    0 6792    0          pts/0  0:00 ps wwl
+     F S UID      PID     PPID   C PRI NI ADDR  SZ  RSS   WCHAN    TTY  TIME CMD
+240001 A 203 14549132  8192226   1  60 20 96aaf7590 2620 2552          pts/0  0:00 -bash
+200001 A 203  6384118 14549132   3  61 20 8aaeeb590 1440 1468          pts/0  0:00 ps wwl
+    """,    # noqa
+    """\
+     F S      UID    PID   PPID   C PRI NI ADDR  SZ  RSS   WCHAN    TTY  TIME CMD
+240000 A      105 932687 932686   0  20 20    0 7516    0          pts/0  0:00 -bash
+200000 A      105 932807 932687   0  20 20    0 16504    0          pts/0  0:00 python3
+200000 A      105 932808 932807   0  20 20    0 6792    0          pts/0  0:00 ps wwl
     """,    # noqa
 ]
 
@@ -43,8 +49,13 @@ PS_EXPECTED = [
         '82557': Process(pid='82557', ppid='82556', args=('-bash',)),
     },
     {
-        '897903': Process(pid='897903', ppid='897902', args=('-bash',)),
-        '897904': Process(pid='897904', ppid='897903', args=('ps', 'wwl')),
+        '14549132': Process(pid='14549132', ppid='8192226', args=('-bash',)),
+        '6384118': Process(pid='6384118', ppid='14549132', args=('ps', 'wwl')),
+    },
+    {
+        '932687': Process(pid='932687', ppid='932686', args=('-bash',)),
+        '932807': Process(pid='932807', ppid='932687', args=('python3')),
+        '932808': Process(pid='932808', ppid='932807', args=('ps', 'wwl')),
     },
 ]
 
@@ -52,7 +63,7 @@ PS_EXPECTED = [
 @pytest.mark.parametrize(
     'output, expected',
     zip(PS_OUTPUTS, PS_EXPECTED),
-    ids=['BSD', 'IBM'],
+    ids=['BSD', 'IBM-off', 'IBM-jigger'],
 )
 def test_parse_ps_output(output, expected):
     parsed = dict(_parse_ps_output(output))
