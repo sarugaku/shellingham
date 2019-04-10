@@ -1,3 +1,13 @@
+1.3.1 (2019-04-10)
+==================
+
+Bug Fixes
+---------
+
+- Fix a typo that prevents ash and csh from being detected.  `#24
+  <https://github.com/sarugaku/shellingham/issues/24>`_
+
+
 1.3.0 (2019-03-06)
 ==================
 
