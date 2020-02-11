@@ -54,7 +54,7 @@ def get_shell(pid=None, max_depth=6):
     mapping = _get_process_mapping()
     for k, v in mapping.items():  # handle xonsh shell by stripping "python" prefixes
         paths = [os.path.basename(arg).lower() for arg in v.args]
-        if 'python' in paths and 'xonsh' in paths:
+        if any(python in paths for python in ['python', 'python2', 'python3']) and 'xonsh' in paths:
             mapping[k] = v._replace(args=[arg for arg in v.args[1:] if not arg.startswith('-')])
     for proc_cmd in _iter_process_command(mapping, pid, max_depth):
         if proc_cmd.startswith('-'):    # Login shell! Let's use this.
