@@ -1,3 +1,12 @@
+1.3.2 (2020-02-12)
+==================
+
+Bug Fixes
+---------
+
+- Parse argument list to detect shells run via an interpreter, e.g. xonsh via Python.  `#27 <https://github.com/sarugaku/shellingham/issues/27>`_
+
+
 1.3.1 (2019-04-10)
 ==================
 
