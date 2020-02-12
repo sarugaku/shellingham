@@ -106,19 +106,7 @@ def release(ctx, type_, repo):
     tag_content = tag_content.replace('"', '\\"')
     ctx.run(f'git tag -a {version} -m "Version {version}\n\n{tag_content}"')
 
-    ctx.run(f'python setup.py sdist bdist_wheel')
-
-    artifacts = list(ROOT.joinpath('dist').glob('shellingham-*'))
-    filename_display = '\n'.join(f'  {a}' for a in artifacts)
-    print(f'[release] Will upload:\n{filename_display}')
-    try:
-        input('[release] Release ready. ENTER to upload, CTRL-C to abort: ')
-    except KeyboardInterrupt:
-        print('\nAborted!')
-        return
-
-    arg_display = ' '.join(f'"{n}"' for n in artifacts)
-    ctx.run(f'twine upload --repository="{repo}" {arg_display}')
+    ctx.run(f'setl publish --repository="{repo}"')
 
     version = _prebump(version)
     _write_version(version)

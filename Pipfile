@@ -6,8 +6,8 @@ invoke = '*'
 parver = '*'
 pytest = '*'
 pytest-mock = '*'
+setl = '*'
 towncrier = '*'
-wheel = '*'
 
 [scripts]
 release = 'inv release'
