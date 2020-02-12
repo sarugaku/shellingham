@@ -1,0 +1,1 @@
+Parse argument list to detect shells run via an interpreter, e.g. xonsh via Python.
