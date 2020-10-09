@@ -13,7 +13,8 @@ jobs:
         python -c 'import logging, sys, shellingham;
         logging.basicConfig(stream=sys.stderr, level=0, force=True);
         shell = shellingham.detect_shell();
-        print()'
+        print(shell);
+        print(shell.pid)'
 
   macos:
     runs-on: macos-latest
@@ -25,4 +26,5 @@ jobs:
         python -c 'import logging, sys, shellingham;
         logging.basicConfig(stream=sys.stderr, level=0, force=True);
         shell = shellingham.detect_shell();
-        print()'
+        print(shell);
+        print(shell.pid)'
