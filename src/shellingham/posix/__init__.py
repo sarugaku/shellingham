@@ -76,6 +76,7 @@ def _get_interpreter_shell(proc_name, proc_args):
 
 def _get_shell(cmd, *args):
     if cmd.startswith('-'):     # Login shell! Let's use this.
+        logger.info('Login shell detected')
         return _get_login_shell(cmd)
     name = os.path.basename(cmd).lower()
     if name in SHELL_NAMES:     # Command looks like a shell.
