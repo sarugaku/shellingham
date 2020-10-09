@@ -1,0 +1,16 @@
+on: [push, pull_request]
+
+name: ci
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: cd src; python -c 'import shellingham; print(shellingham.detect_shell())'
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: cd src; python -c 'import shellingham; print(shellingham.detect_shell())'
