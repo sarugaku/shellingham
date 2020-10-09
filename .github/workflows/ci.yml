@@ -7,10 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: cd src; python -c 'import shellingham; print(shellingham.detect_shell())'
+    - run: python -m pip install .
+    - run: >
+        python -c 'import logging, sys, shellingham;
+        logging.basicConfig(stream=sys.stderr, level=0, force=True)
+        shell = shellingham.detect_shell();
+        print()'
 
   macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - run: cd src; python -c 'import shellingham; print(shellingham.detect_shell())'
+    - run: python -m pip install .
+    - run: >
+        python -c 'import logging, sys, shellingham;
+        logging.basicConfig(stream=sys.stderr, level=0, force=True)
+        shell = shellingham.detect_shell();
+        print()'

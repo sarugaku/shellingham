@@ -1,8 +1,12 @@
+import logging
 import os
 import re
 
 from .._core import SHELL_NAMES, ShellDetectionFailure
 from . import proc, ps
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_process_mapping():
@@ -16,6 +20,7 @@ def _get_process_mapping():
             mapping = impl.get_process_mapping()
         except EnvironmentError:
             continue
+        logger.info('Using POSIX backend %r', impl.__name__)
         return mapping
     raise ShellDetectionFailure('compatible proc fs or ps utility is required')
 
