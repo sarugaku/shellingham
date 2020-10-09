@@ -15,7 +15,7 @@ def detect_shell(pid=None, max_depth=6):
     try:
         impl = importlib.import_module('.' + name, __name__)
     except ImportError as e:
-        logger.debug(exc_info=e)
+        logger.debug('OS detection failed', exc_info=e)
         raise RuntimeError(
             'Shell detection not implemented for {0!r}'.format(name),
         )
