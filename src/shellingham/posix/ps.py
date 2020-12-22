@@ -12,10 +12,16 @@ class PsNotAvailable(EnvironmentError):
 def get_process_mapping():
     """Try to look up the process tree via the output of `ps`.
     """
+    args = [
+        'ps', '-ww', '-o', 'pid=', '-o', 'ppid=', '-o', 'args=',
+    ]
+    if sys.platform.startswith('aix') or sys.platform.startswith('os400'):
+        # AIX ps does not support the '-w' option. While it does
+        # support the 'w' option in Berkeley mode, this mode does not
+        # support the '-o' option :(
+        args.remove('-ww')
     try:
-        output = subprocess.check_output([
-            'ps', '-ww', '-o', 'pid=', '-o', 'ppid=', '-o', 'args=',
-        ])
+        output = subprocess.check_output(args)
     except OSError as e:    # Python 2-compatible FileNotFoundError.
         if e.errno != errno.ENOENT:
             raise
