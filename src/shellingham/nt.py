@@ -106,6 +106,10 @@ def _get_executable(process_dict):
 def get_shell(pid=None, max_depth=6):
     """Get the shell that the supplied pid or os.getpid() is running in.
     """
+    import shellingham.windows as windows
+    # I don't know what the rest of the nt.py thing does.
+    return windows.get_shell(pid, max_depth)
+
     if not pid:
         pid = os.getpid()
     processes = dict(_iter_process())
