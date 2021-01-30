@@ -1,132 +1,144 @@
-# Code based on the winappdbg project http://winappdbg.sourceforge.net/
-# (BSD License) - adapted from Celery by Dan Ryan (dan@danryan.co)
-# https://github.com/celery/celery/blob/2.5-archived/celery/concurrency/processes/_win.py
+"""
+Get name and full path of most recent ancestor process that is a shell.
+Credits: https://stackoverflow.com/a/65955496/33264
+"""
+import contextlib
+import ctypes
+import ctypes.wintypes
 
-import os
-import sys
+k32 = ctypes.windll.kernel32
 
-from ctypes import (
-    byref, sizeof, windll, Structure, WinError,
-    c_size_t, c_char, c_void_p
-)
-from ctypes.wintypes import DWORD, LONG
-
-from ._core import SHELL_NAMES
-
-
+INVALID_HANDLE_VALUE = ctypes.wintypes.HANDLE(-1).value
 ERROR_NO_MORE_FILES = 18
 ERROR_INSUFFICIENT_BUFFER = 122
-
-INVALID_HANDLE_VALUE = c_void_p(-1).value
-
-
-if sys.version_info[0] < 3:
-    string_types = (str, unicode)   # noqa
-else:
-    string_types = (str,)
+TH32CS_SNAPPROCESS = 2
+PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 
 
-class PROCESSENTRY32(Structure):
-    _fields_ = [
-        ('dwSize', DWORD),
-        ('cntUsage', DWORD),
-        ('th32ProcessID', DWORD),
-        ('th32DefaultHeapID', c_size_t),
-        ('th32ModuleID', DWORD),
-        ('cntThreads', DWORD),
-        ('th32ParentProcessID', DWORD),
-        ('pcPriClassBase', LONG),
-        ('dwFlags', DWORD),
-        ('szExeFile', c_char * 260),
-    ]
+def _check_handle(error_val=0):
+    def check(ret, func, args):
+        if ret == error_val:
+            raise ctypes.WinError()
+        return ret
+
+    return check
 
 
-def _iter_process():
-    """Iterate through processes, yielding process ID and properties of each.
+def _check_expected(expected):
+    def check(ret, func, args):
+        if ret:
+            return True
+        code = ctypes.GetLastError()
+        if code == expected:
+            return False
+        raise ctypes.WinError(code)
 
-    Example usage::
+    return check
 
-        >>> for pid, info in _iter_process():
-        ...     print(pid, '->', info)
-        1509 -> {'parent_pid': 1201, 'executable': 'python.exe'}
-    """
-    # TODO: Process32{First,Next} does not return full executable path, only
-    # the name. To get the full path, Module32{First,Next} is needed, but that
-    # does not contain parent process information. We probably need to call
-    # BOTH to build the correct process tree.
-    h_process = windll.kernel32.CreateToolhelp32Snapshot(
-        2,  # dwFlags=TH32CS_SNAPPROCESS (include all processes).
-        0,  # th32ProcessID=0 (the current process).
+
+class ProcessEntry32(ctypes.Structure):
+    _fields_ = (
+        ('dwSize', ctypes.wintypes.DWORD),
+        ('cntUsage', ctypes.wintypes.DWORD),
+        ('th32ProcessID', ctypes.wintypes.DWORD),
+        ('th32DefaultHeapID', ctypes.POINTER(ctypes.wintypes.ULONG)),
+        ('th32ModuleID', ctypes.wintypes.DWORD),
+        ('cntThreads', ctypes.wintypes.DWORD),
+        ('th32ParentProcessID', ctypes.wintypes.DWORD),
+        ('pcPriClassBase', ctypes.wintypes.LONG),
+        ('dwFlags', ctypes.wintypes.DWORD),
+        ('szExeFile', ctypes.wintypes.CHAR * ctypes.wintypes.MAX_PATH),
     )
-    if h_process == INVALID_HANDLE_VALUE:
-        raise WinError()
-    pe = PROCESSENTRY32()
-    pe.dwSize = sizeof(PROCESSENTRY32)
-    success = windll.kernel32.Process32First(h_process, byref(pe))
-    while True:
-        if not success:
-            errcode = windll.kernel32.GetLastError()
-            if errcode == ERROR_NO_MORE_FILES:
-                # No more processes to iterate through, we're done here.
-                return
-            elif errcode == ERROR_INSUFFICIENT_BUFFER:
-                # This is likely because the file path is longer than the
-                # Windows limit. Just ignore it, it's likely not what we're
-                # looking for. We can fix this when it actually matters. (#8)
-                continue
-            raise WinError()
-
-        # The executable name would be encoded with the current code page if
-        # we're in ANSI mode (usually). Try to decode it into str/unicode,
-        # replacing invalid characters to be safe (not thoeratically necessary,
-        # I think). Note that we need to use 'mbcs' instead of encoding
-        # settings from sys because this is from the Windows API, not Python
-        # internals (which those settings reflect). (pypa/pipenv#3382)
-        executable = pe.szExeFile
-        if isinstance(executable, bytes):
-            executable = executable.decode('mbcs', 'replace')
-
-        info = {'executable': executable}
-        if pe.th32ParentProcessID:
-            info['parent_pid'] = pe.th32ParentProcessID
-        yield pe.th32ProcessID, info
-        success = windll.kernel32.Process32Next(h_process, byref(pe))
 
 
-def _get_executable(process_dict):
+k32.CloseHandle.argtypes = \
+    (ctypes.wintypes.HANDLE,)
+k32.CloseHandle.restype = ctypes.wintypes.BOOL
+
+k32.CreateToolhelp32Snapshot.argtypes = \
+    (ctypes.wintypes.DWORD, ctypes.wintypes.DWORD)
+k32.CreateToolhelp32Snapshot.restype = ctypes.wintypes.HANDLE
+k32.CreateToolhelp32Snapshot.errcheck = _check_handle(INVALID_HANDLE_VALUE)
+
+k32.Process32First.argtypes = \
+    (ctypes.wintypes.HANDLE, ctypes.POINTER(ProcessEntry32))
+k32.Process32First.restype = ctypes.wintypes.BOOL
+k32.Process32First.errcheck = _check_expected(ERROR_NO_MORE_FILES)
+
+k32.Process32Next.argtypes = \
+    (ctypes.wintypes.HANDLE, ctypes.POINTER(ProcessEntry32))
+k32.Process32Next.restype = ctypes.wintypes.BOOL
+k32.Process32Next.errcheck = _check_expected(ERROR_NO_MORE_FILES)
+
+k32.GetCurrentProcessId.argtypes = ()
+k32.GetCurrentProcessId.restype = ctypes.wintypes.DWORD
+
+k32.OpenProcess.argtypes = \
+    (ctypes.wintypes.DWORD, ctypes.wintypes.BOOL, ctypes.wintypes.DWORD)
+k32.OpenProcess.restype = ctypes.wintypes.HANDLE
+k32.OpenProcess.errcheck = _check_handle(INVALID_HANDLE_VALUE)
+
+k32.QueryFullProcessImageNameW.argtypes = \
+    (ctypes.wintypes.HANDLE, ctypes.wintypes.DWORD, ctypes.wintypes.LPWSTR,
+     ctypes.wintypes.PDWORD)
+k32.QueryFullProcessImageNameW.restype = ctypes.wintypes.BOOL
+k32.QueryFullProcessImageNameW.errcheck = _check_expected(ERROR_INSUFFICIENT_BUFFER)
+
+
+@contextlib.contextmanager
+def Win32Handle(handle):
     try:
-        executable = process_dict.get('executable')
-    except (AttributeError, TypeError):
-        return None
-    if isinstance(executable, string_types):
-        executable = executable.lower().rsplit('.', 1)[0]
-    return executable
+        yield handle
+    finally:
+        k32.CloseHandle(handle)
+
+
+def enum_processes():
+    with Win32Handle(k32.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)) as snap:
+        entry = ProcessEntry32()
+        entry.dwSize = ctypes.sizeof(entry)
+        ret = k32.Process32First(snap, entry)
+        while ret:
+            yield entry
+            ret = k32.Process32Next(snap, entry)
+
+
+def get_full_path(proch):
+    size = ctypes.wintypes.DWORD(ctypes.wintypes.MAX_PATH)
+    while True:
+        path_buff = ctypes.create_unicode_buffer('', size.value)
+        if k32.QueryFullProcessImageNameW(proch, 0, path_buff, size):
+            return path_buff.value
+        size.value *= 2
+
+
+SHELLS = frozenset((
+    b'sh.exe', b'bash.exe', b'dash.exe', b'ash.exe',
+    b'csh.exe', b'tcsh.exe',
+    b'ksh.exe', b'zsh.exe', b'fish.exe',
+    b'cmd.exe', b'powershell.exe', b'pwsh.exe',
+    b'elvish.exe', b'xonsh.exe',
+))
 
 
 def get_shell(pid=None, max_depth=6):
-    """Get the shell that the supplied pid or os.getpid() is running in.
-    """
-    import shellingham.windows as windows
-    # I don't know what the rest of the nt.py thing does.
-    return windows.get_shell(pid, max_depth)
-
+    proc_map = {
+        proc.th32ProcessID: (proc.th32ParentProcessID, proc.szExeFile)
+        for proc in enum_processes()
+    }
     if not pid:
-        pid = os.getpid()
-    processes = dict(_iter_process())
+        pid = proc_map[k32.GetCurrentProcessId()][0]
+    proc = proc_map[pid]
+    depth = 0
+    while proc:
+        depth += 1
 
-    def check_parent(pid, lvl=0):
-        ppid = processes[pid].get('parent_pid')
-        shell_name = _get_executable(processes.get(ppid))
-        if shell_name in SHELL_NAMES:
-            return (shell_name, processes[ppid]['executable'])
-        if lvl >= max_depth:
+        ppid, name = proc
+
+        if name in SHELLS:
+            with Win32Handle(k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0,
+                                             pid)) as proch:
+                return (name.decode(), get_full_path(proch))
+        pid, proc = ppid, proc_map.get(ppid)
+        if depth > max_depth:
             return None
-        return check_parent(ppid, lvl=lvl + 1)
-
-    shell_name = _get_executable(processes.get(pid))
-    if shell_name in SHELL_NAMES:
-        return (shell_name, processes[pid]['executable'])
-    try:
-        return check_parent(pid)
-    except KeyError:
-        return None
