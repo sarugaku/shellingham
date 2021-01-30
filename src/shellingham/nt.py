@@ -1,10 +1,16 @@
 """
 Get name and full path of most recent ancestor process that is a shell.
-Credits: https://stackoverflow.com/a/65955496/33264
+
+# Code based on the winappdbg project http://winappdbg.sourceforge.net/
+# (BSD License) - adapted from Celery by Dan Ryan (dan@danryan.co)
+# https://github.com/celery/celery/blob/2.5-archived/celery/concurrency/processes/_win.py
+More Credits: https://stackoverflow.com/a/65955496/33264
 """
 import contextlib
 import ctypes
 import ctypes.wintypes
+
+from shellingham._core import SHELL_NAMES
 
 k32 = ctypes.windll.kernel32
 
@@ -112,13 +118,7 @@ def get_full_path(proch):
         size.value *= 2
 
 
-SHELLS = frozenset((
-    b'sh.exe', b'bash.exe', b'dash.exe', b'ash.exe',
-    b'csh.exe', b'tcsh.exe',
-    b'ksh.exe', b'zsh.exe', b'fish.exe',
-    b'cmd.exe', b'powershell.exe', b'pwsh.exe',
-    b'elvish.exe', b'xonsh.exe',
-))
+SHELLS = frozenset((_.encode() + b".exe" for _ in SHELL_NAMES))
 
 
 def get_shell(pid=None, max_depth=6):
