@@ -1,0 +1,2 @@
+On Windows, the full path to the shell executable is now returned instead of
+just the base name.
