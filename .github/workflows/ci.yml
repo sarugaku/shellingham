@@ -11,6 +11,7 @@ jobs:
 
   macos:
     runs-on: macos-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v2
     - run: cd src; python -c 'import shellingham; print(shellingham.detect_shell())'
