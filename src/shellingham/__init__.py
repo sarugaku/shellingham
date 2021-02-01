@@ -7,7 +7,7 @@ from ._core import ShellDetectionFailure
 __version__ = "1.3.3dev0"
 
 
-def detect_shell(pid=None, max_depth=6):
+def detect_shell(pid=None, max_depth=10):
     name = os.name
     try:
         impl = importlib.import_module(".{}".format(name), __name__)

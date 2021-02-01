@@ -79,7 +79,7 @@ def _get_shell(cmd, *args):
     return None
 
 
-def get_shell(pid=None, max_depth=6):
+def get_shell(pid=None, max_depth=10):
     """Get the shell that the supplied pid or os.getpid() is running in."""
     pid = str(pid or os.getpid())
     mapping = _get_process_mapping()

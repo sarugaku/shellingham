@@ -129,7 +129,7 @@ def _get_full_path(proch):
         size.value *= 2
 
 
-def get_shell(pid=None, max_depth=6):
+def get_shell(pid=None, max_depth=10):
     proc_map = {
         proc.th32ProcessID: (proc.th32ParentProcessID, proc.szExeFile)
         for proc in _iter_processes()
