@@ -1,3 +1,13 @@
+1.4.0 (2021-02-01)
+==================
+
+Features
+--------
+
+- On Windows, the full path to the shell executable is now returned instead of
+  just the base name.  `#42 <https://github.com/sarugaku/shellingham/issues/42>`_
+
+
 1.3.2 (2020-02-12)
 ==================
 
