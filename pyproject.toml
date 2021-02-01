@@ -1,6 +1,9 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 
+[tool.black]
+line-length = 79
+
 [tool.towncrier]
 package = "shellingham"
 package_dir = "src"
