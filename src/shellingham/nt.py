@@ -151,12 +151,13 @@ def get_shell(pid=None, max_depth=10):
         if isinstance(executable, bytes):
             executable = executable.decode("mbcs", "replace")
 
-        if executable.rpartition(".")[0].lower() not in SHELL_NAMES:
+        name = executable.rpartition(".")[0].lower()
+        if name not in SHELL_NAMES:
             pid = ppid
             continue
 
         key = PROCESS_QUERY_LIMITED_INFORMATION
         with _handle(kernel32.OpenProcess, key, 0, pid) as proch:
-            return (executable, _get_full_path(proch))
+            return (name, _get_full_path(proch))
 
     return None
