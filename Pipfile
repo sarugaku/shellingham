@@ -8,6 +8,8 @@ pytest = '*'
 pytest-mock = '*'
 setl = '*'
 towncrier = '*'
+tox = '*'
+tox-gh-actions = '*'
 
 [scripts]
 release = 'inv release'
