@@ -1,5 +1,4 @@
 .env
-.pytest_cache
 .venv
 __pycache__
 
@@ -9,3 +8,10 @@ dist
 *.egg-info
 
 *.py[co]
+
+# Editors
+.vscode
+
+# Testing
+.tox
+.pytest_cache
