@@ -33,8 +33,6 @@ Notes
 * The shell name is always lowercased.
 * On Windows, the shell name is the name of the executable, minus the file
   extension.
-* Currently the command only contains the executable name on Windows, even if
-  the command is invoked by the full path. This may change in the future.
 
 
 Notes for Application Developers
