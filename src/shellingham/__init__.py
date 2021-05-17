@@ -7,7 +7,7 @@ from ._core import ShellDetectionFailure
 __version__ = "1.4.1.dev0"
 
 
-def detect_shell(pid=None, max_depth=10):
+def detect_shell(pid=None, max_depth=10, quiet=False):
     name = os.name
     try:
         impl = importlib.import_module(".{}".format(name), __name__)
@@ -21,4 +21,6 @@ def detect_shell(pid=None, max_depth=10):
     shell = get_shell(pid, max_depth=max_depth)
     if shell:
         return shell
+    if quiet:
+        return None
     raise ShellDetectionFailure()
