@@ -56,7 +56,7 @@ There are a few choices for you to choose from.
   "the user's preferred command language interpreter". This is always available
   (even if the user is not in an interactive session), and likely the correct
   choice to launch an interactive sub-shell with.
-* A command ``sh`` is almost guarenteed to exist, likely at ``/bin/sh``, since
+* A command ``sh`` is almost guaranteed to exist, likely at ``/bin/sh``, since
   several POSIX tools rely on it. This should be suitable if you want to run a
   (possibly non-interactive) script.
 * All versions of DOS and Windows have an environment variable ``COMSPEC``.
