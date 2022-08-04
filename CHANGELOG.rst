@@ -1,3 +1,13 @@
+1.5.0 (2022-08-04)
+==================
+
+Features
+--------
+
+- Drop support for Python version older than 3.4.  `#50 <https://github.com/sarugaku/shellingham/issues/50>`_
+- Support detecting NuShell.  `#56 <https://github.com/sarugaku/shellingham/issues/56>`_
+
+
 1.4.0 (2021-02-01)
 ==================
 
