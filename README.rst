@@ -11,7 +11,7 @@ Shellingham detects what shell the current Python executable is running in.
 Usage
 =====
 
-::
+.. code-block:: python
 
     >>> import shellingham
     >>> shellingham.detect_shell()
@@ -43,12 +43,15 @@ Shellingham raises ``ShellDetectionFailure`` if there is no shell to detect,
 but *your application should almost never do this to your user*.
 
 A practical approach to this is to wrap ``detect_shell`` in a try block, and
-provide a sane default on failure::
+provide a sane default on failure
+
+.. code-block:: python
 
     try:
         shell = shellingham.detect_shell()
     except shellingham.ShellDetectionFailure:
         shell = provide_default()
+
 
 There are a few choices for you to choose from.
 
@@ -63,7 +66,9 @@ There are a few choices for you to choose from.
   This can always be used to launch a usable command prompt (e.g. `cmd.exe` on
   Windows).
 
-Here's a simple implementation to provide a default shell::
+Here's a simple implementation to provide a default shell
+
+.. code-block:: python
 
     import os
 
