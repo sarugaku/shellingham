@@ -1,10 +1,17 @@
+1.5.0.post1 (2023-01-03)
+==================
+
+- Fix package metadata to disallow installation on Python prior to 3.7. This was already done in 1.5.0,
+  but the metadata of the release was incorrectly set to ``>=3.4``.
+
+
 1.5.0 (2022-08-04)
 ==================
 
 Features
 --------
 
-- Drop support for Python version older than 3.4.  `#50 <https://github.com/sarugaku/shellingham/issues/50>`_
+- Drop support for Python version older than 3.7.  `#50 <https://github.com/sarugaku/shellingham/issues/50>`_
 - Support detecting NuShell.  `#56 <https://github.com/sarugaku/shellingham/issues/56>`_
 
 
