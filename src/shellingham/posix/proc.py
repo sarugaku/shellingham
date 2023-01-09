@@ -5,9 +5,18 @@ import sys
 
 from ._core import Process
 
-
-STAT_PPID = 3
-STAT_TTY = 6
+if os.uname().sysname.lower() in ('freebsd', 'netbsd', 'dragonfly'):
+    # /proc/#/status fields on BSD systems
+    # FreeBSD: https://www.freebsd.org/cgi/man.cgi?query=procfs&apropos=0&sektion=0&manpath=FreeBSD+13.1-RELEASE&arch=default&format=html 
+    # NetBSD: https://man.netbsd.org/NetBSD-9.3-STABLE/mount_procfs.8
+    # DragonFlyBSD: https://www.dragonflybsd.org/cgi/web-man?command=procfs
+    STAT_PPID = 2
+    STAT_TTY = 5
+else:
+    # /proc/#/status fields on linux systems
+    # see https://docs.kernel.org/filesystems/proc.html
+    STAT_PPID = 3
+    STAT_TTY = 6
 
 STAT_PATTERN = re.compile(r"\(.+\)|\S+")
 
