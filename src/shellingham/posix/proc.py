@@ -5,18 +5,15 @@ import sys
 
 from ._core import Process
 
-if os.uname().sysname.lower() in ('freebsd', 'netbsd', 'dragonfly'):
-    # /proc/#/status fields on BSD systems
-    # FreeBSD: https://www.freebsd.org/cgi/man.cgi?query=procfs&apropos=0&sektion=0&manpath=FreeBSD+13.1-RELEASE&arch=default&format=html 
-    # NetBSD: https://man.netbsd.org/NetBSD-9.3-STABLE/mount_procfs.8
-    # DragonFlyBSD: https://www.dragonflybsd.org/cgi/web-man?command=procfs
-    STAT_PPID = 2
-    STAT_TTY = 5
-else:
-    # /proc/#/status fields on linux systems
-    # see https://docs.kernel.org/filesystems/proc.html
-    STAT_PPID = 3
-    STAT_TTY = 6
+# FreeBSD: https://www.freebsd.org/cgi/man.cgi?query=procfs
+# NetBSD: https://man.netbsd.org/NetBSD-9.3-STABLE/mount_procfs.8
+# DragonFlyBSD: https://www.dragonflybsd.org/cgi/web-man?command=procfs
+BSD_STAT_PPID = 2
+BSD_STAT_TTY = 5
+
+# See https://docs.kernel.org/filesystems/proc.html
+LINUX_STAT_PPID = 3
+LINUX_STAT_TTY = 6
 
 STAT_PATTERN = re.compile(r"\(.+\)|\S+")
 
@@ -37,12 +34,21 @@ def detect_proc():
     raise ProcFormatError("unsupported proc format")
 
 
+def _use_bsd_stat_format():
+    try:
+        return os.uname().sysname.lower() in ('freebsd', 'netbsd', 'dragonfly')
+    except Exception:
+        return False
+
+
 def _get_stat(pid, name):
     path = os.path.join("/proc", str(pid), name)
     with io.open(path, encoding="ascii", errors="replace") as f:
-        # We only care about TTY and PPID -- all numbers.
         parts = STAT_PATTERN.findall(f.read())
-        return parts[STAT_TTY], parts[STAT_PPID]
+    # We only care about TTY and PPID -- both are numbers.
+    if _use_bsd_stat_format():
+        return parts[BSD_STAT_PPID], parts[BSD_STAT_TTY]
+    return parts[LINUX_STAT_PPID], parts[LINUX_STAT_TTY]
 
 
 def _get_cmdline(pid):
