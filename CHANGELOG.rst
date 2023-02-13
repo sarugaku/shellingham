@@ -1,3 +1,12 @@
+1.5.1 (2023-02-13)
+==================
+
+Bug Fixes
+---------
+
+- Select the correct status file fields on BSD systems.  `#68 <https://github.com/sarugaku/shellingham/issues/68>`_
+
+
 1.5.0.post1 (2023-01-03)
 ==================
 
