@@ -47,8 +47,8 @@ def _get_stat(pid, name):
         parts = STAT_PATTERN.findall(f.read())
     # We only care about TTY and PPID -- both are numbers.
     if _use_bsd_stat_format():
-        return parts[BSD_STAT_PPID], parts[BSD_STAT_TTY]
-    return parts[LINUX_STAT_PPID], parts[LINUX_STAT_TTY]
+        return parts[BSD_STAT_TTY], parts[BSD_STAT_PPID]
+    return parts[LINUX_STAT_TTY], parts[LINUX_STAT_PPID]
 
 
 def _get_cmdline(pid):
