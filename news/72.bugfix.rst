@@ -1,2 +1,1 @@
-Fixed a regression introduced in version 1.5.1, which caused
-``ShellDetectionFailure`` if /proc was being used for process lookup.
+Fixed a regression causing ``ShellDetectionFailure`` if ``/proc`` is used for process lookup.
