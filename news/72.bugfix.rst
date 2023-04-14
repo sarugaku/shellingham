@@ -1,0 +1,1 @@
+Fixed a regression causing ``ShellDetectionFailure`` if ``/proc`` is used for process lookup.
