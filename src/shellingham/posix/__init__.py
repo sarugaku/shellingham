@@ -71,6 +71,11 @@ def _get_shell(cmd, *args):
     if cmd.startswith("-"):  # Login shell! Let's use this.
         return _get_login_shell(cmd)
     name = os.path.basename(cmd).lower()
+    if name == "rosetta" or name.contains("qemu-"):
+        # Running (probably in docker) with rosetta or qemu, first arg is real command
+        cmd = args[0]
+        args = args[1:]
+        name = os.path.basename(cmd).lower()
     if name in SHELL_NAMES:  # Command looks like a shell.
         return (name, cmd)
     shell = _get_interpreter_shell(name, args)
