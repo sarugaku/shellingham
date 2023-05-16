@@ -8,9 +8,11 @@ from ._core import Process
 class PsNotAvailable(EnvironmentError):
     pass
 
-def _get_stats(pid):
+
+def get_process_parents(pid, max_depth=10):
+    """Try to look up the process tree via the output of `ps`."""
     try:
-        cmd = ["ps", "wwl", "-P", pid]
+        cmd = ["ps", "-ww", "-o", "pid=", "-o", "ppid=", "-o", "args="]
         output = subprocess.check_output(cmd)
     except OSError as e:  # Python 2-compatible FileNotFoundError.
         if e.errno != errno.ENOENT:
@@ -26,37 +28,25 @@ def _get_stats(pid):
         encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
         output = output.decode(encoding)
 
-    print(output)
+    processes_mapping = {}
+    for line in output.split("\n"):
+        try:
+            pid, ppid, args = line.strip().split(None, 2)
+            # XXX: This is not right, but we are really out of options.
+            # ps does not offer a sane way to decode the argument display,
+            # and this is "Good Enough" for obtaining shell names. Hopefully
+            # people don't name their shell with a space, or have something
+            # like "/usr/bin/xonsh is uber". (sarugaku/shellingham#14)
+            args = tuple(a.strip() for a in args.split(" "))
+        except ValueError:
+            continue
+        processes_mapping[pid] = Process(args=args, pid=pid, ppid=ppid)
 
-    header, row = output.split("\n")[:2]
-    header = header.split()
-    row = row.split()
-
-    pid_index = header.index("PID")
-    ppid_index = header.index("PPID")
-
-    try:
-        cmd_index = header.index("COMMAND")
-    except ValueError:
-        # https://github.com/sarugaku/shellingham/pull/23#issuecomment-474005491
-        cmd_index = header.index("CMD")
-
-
-    return row[cmd_index:], row[pid_index], row[ppid_index]
-
-
-
-
-def get_process_parents(pid, max_depth=10):
-    """Try to look up the process tree via the output of `ps`."""
-    processes = []
-
+    parent_processes = []
     depth = 0
-    while pid != "0" and depth < max_depth:
+    while pid in processes_mapping and depth < max_depth:
+        parent_processes.append(processes_mapping[pid])
+        pid = processes_mapping[pid].ppid
         depth += 1
-        cmd, pid, ppid = _get_stats(pid)
-        processes.append(Process(args=cmd, pid=pid, ppid=ppid))
 
-        pid = ppid
-
-    return processes
+    return parent_processes
