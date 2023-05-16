@@ -4,8 +4,33 @@ import re
 from .._core import SHELL_NAMES, ShellDetectionFailure
 from . import proc, ps
 
+# Based on QEMU docs: https://www.qemu.org/docs/master/user/main.html
 QEMU_BIN_REGEX = re.compile(
-    r"qemu-(alpha|armeb|arm|m68k|cris|i386|x86_64|microblaze|mips|mipsel|mips64|mips64el|mipsn32|mipsn32el|nios2|ppc64|ppc|sh4eb|sh4|sparc|sparc32plus|sparc64)"
+    r"""qemu-
+        (alpha
+        |armeb
+        |arm
+        |m68k
+        |cris
+        |i386
+        |x86_64
+        |microblaze
+        |mips
+        |mipsel
+        |mips64
+        |mips64el
+        |mipsn32
+        |mipsn32el
+        |nios2
+        |ppc64
+        |ppc
+        |sh4eb
+        |sh4
+        |sparc
+        |sparc32plus
+        |sparc64
+    )""",
+    re.VERBOSE,
 )
 
 
