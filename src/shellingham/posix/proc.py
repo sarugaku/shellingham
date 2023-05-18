@@ -9,11 +9,9 @@ from ._core import Process
 # NetBSD: https://man.netbsd.org/NetBSD-9.3-STABLE/mount_procfs.8
 # DragonFlyBSD: https://www.dragonflybsd.org/cgi/web-man?command=procfs
 BSD_STAT_PPID = 2
-BSD_STAT_TTY = 5
 
 # See https://docs.kernel.org/filesystems/proc.html
 LINUX_STAT_PPID = 3
-LINUX_STAT_TTY = 6
 
 STAT_PATTERN = re.compile(r"\(.+\)|\S+")
 
@@ -41,14 +39,14 @@ def _use_bsd_stat_format():
         return False
 
 
-def _get_stat(pid, name):
+def _get_ppid(pid, name):
     path = os.path.join("/proc", str(pid), name)
     with io.open(path, encoding="ascii", errors="replace") as f:
         parts = STAT_PATTERN.findall(f.read())
     # We only care about TTY and PPID -- both are numbers.
     if _use_bsd_stat_format():
-        return parts[BSD_STAT_TTY], parts[BSD_STAT_PPID]
-    return parts[LINUX_STAT_TTY], parts[LINUX_STAT_PPID]
+        return parts[BSD_STAT_PPID]
+    return parts[LINUX_STAT_PPID]
 
 
 def _get_cmdline(pid):
@@ -66,21 +64,13 @@ class ProcFormatError(EnvironmentError):
     pass
 
 
-def get_process_mapping():
+def iter_process_parents(pid, max_depth=10):
     """Try to look up the process tree via the /proc interface."""
     stat_name = detect_proc()
-    self_tty = _get_stat(os.getpid(), stat_name)[0]
-    processes = {}
-    for pid in os.listdir("/proc"):
-        if not pid.isdigit():
-            continue
-        try:
-            tty, ppid = _get_stat(pid, stat_name)
-            if tty != self_tty:
-                continue
-            args = _get_cmdline(pid)
-            processes[pid] = Process(args=args, pid=pid, ppid=ppid)
-        except IOError:
-            # Process has disappeared - just ignore it.
-            continue
-    return processes
+    for _ in range(max_depth):
+        ppid = _get_ppid(pid, stat_name)
+        args = _get_cmdline(pid)
+        yield Process(args=args, pid=pid, ppid=ppid)
+        if ppid == "0":
+            break
+        pid = ppid
