@@ -34,7 +34,7 @@ QEMU_BIN_REGEX = re.compile(
 )
 
 
-def _get_process_parents(pid, max_depth=10):
+def _iter_process_parents(pid, max_depth=10):
     """Select a way to obtain process information from the system.
 
     * `/proc` is used if supported.
@@ -42,10 +42,10 @@ def _get_process_parents(pid, max_depth=10):
     """
     for impl in (proc, ps):
         try:
-            mapping = impl.get_process_parents(pid, max_depth)
+            iterator = impl.iter_process_parents(pid, max_depth)
         except EnvironmentError:
             continue
-        return mapping
+        return iterator
     raise ShellDetectionFailure("compatible proc fs or ps utility is required")
 
 
@@ -89,7 +89,8 @@ def _get_shell(cmd, *args):
         return _get_login_shell(cmd)
     name = os.path.basename(cmd).lower()
     if name == "rosetta" or QEMU_BIN_REGEX.fullmatch(name):
-        # Running (probably in docker) with rosetta or qemu, first arg is actual command
+        # If the current process is Rosetta or QEMU, this likely is a
+        # containerized process. Parse out the actual command instead.
         cmd = args[0]
         args = args[1:]
         name = os.path.basename(cmd).lower()
@@ -104,8 +105,7 @@ def _get_shell(cmd, *args):
 def get_shell(pid=None, max_depth=10):
     """Get the shell that the supplied pid or os.getpid() is running in."""
     pid = str(pid or os.getpid())
-    processes = _get_process_parents(pid, max_depth)
-    for proc_args, _, _ in processes:
+    for proc_args, _, _ in _iter_process_parents(pid, max_depth):
         shell = _get_shell(*proc_args)
         if shell:
             return shell

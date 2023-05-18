@@ -9,7 +9,7 @@ class PsNotAvailable(EnvironmentError):
     pass
 
 
-def get_process_parents(pid, max_depth=10):
+def iter_process_parents(pid, max_depth=10):
     """Try to look up the process tree via the output of `ps`."""
     try:
         cmd = ["ps", "-ww", "-o", "pid=", "-o", "ppid=", "-o", "args="]
@@ -22,7 +22,7 @@ def get_process_parents(pid, max_depth=10):
         # `ps` can return 1 if the process list is completely empty.
         # (sarugaku/shellingham#15)
         if not e.output.strip():
-            return {}
+            return
         raise
     if not isinstance(output, str):
         encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
@@ -42,11 +42,10 @@ def get_process_parents(pid, max_depth=10):
             continue
         processes_mapping[pid] = Process(args=args, pid=pid, ppid=ppid)
 
-    parent_processes = []
-    depth = 0
-    while pid in processes_mapping and depth < max_depth:
-        parent_processes.append(processes_mapping[pid])
-        pid = processes_mapping[pid].ppid
-        depth += 1
-
-    return parent_processes
+    for _ in range(max_depth):
+        try:
+            process = processes_mapping[pid]
+        except KeyError:
+            return
+        yield process
+        pid = process.ppid

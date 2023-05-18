@@ -64,22 +64,13 @@ class ProcFormatError(EnvironmentError):
     pass
 
 
-def get_process_parents(pid, max_depth=10):
+def iter_process_parents(pid, max_depth=10):
     """Try to look up the process tree via the /proc interface."""
     stat_name = detect_proc()
-    processes = []
-
-    depth = 0
-    while depth < max_depth:
-        depth += 1
+    for _ in range(max_depth):
         ppid = _get_ppid(pid, stat_name)
         args = _get_cmdline(pid)
-        processes.append(Process(args=args, pid=pid, ppid=ppid))
-
+        yield Process(args=args, pid=pid, ppid=ppid)
         if ppid == "0":
             break
-
         pid = ppid
-
-
-    return processes
