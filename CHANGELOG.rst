@@ -1,3 +1,12 @@
+1.5.2 (2023-08-16)
+==================
+
+Bug Fixes
+---------
+
+- Fixed a regression causing ``ShellDetectionFailure`` if ``/proc`` is used for process lookup.  `#72 <https://github.com/sarugaku/shellingham/issues/72>`_
+
+
 1.5.1 (2023-02-13)
 ==================
 
