@@ -67,10 +67,17 @@ class ProcFormatError(EnvironmentError):
 def iter_process_parents(pid, max_depth=10):
     """Try to look up the process tree via the /proc interface."""
     stat_name = detect_proc()
-    for _ in range(max_depth):
-        ppid = _get_ppid(pid, stat_name)
-        args = _get_cmdline(pid)
-        yield Process(args=args, pid=pid, ppid=ppid)
-        if ppid == "0":
-            break
-        pid = ppid
+
+    # Inner generator function so we correctly throw an error eagerly if proc
+    # is not supported, rather than on the first call to the iterator. This
+    # allows the call site detects the correct implementation.
+    def _iter_process_parents(pid, max_depth):
+        for _ in range(max_depth):
+            ppid = _get_ppid(pid, stat_name)
+            args = _get_cmdline(pid)
+            yield Process(args=args, pid=pid, ppid=ppid)
+            if ppid == "0":
+                break
+            pid = ppid
+
+    return _iter_process_parents(pid, max_depth)

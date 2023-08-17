@@ -1,0 +1,1 @@
+Detect proc format eagerly so it throws the error at the correct location.
