@@ -1,3 +1,12 @@
+1.5.3 (2023-08-17)
+==================
+
+Bug Fixes
+---------
+
+- Detect proc format eagerly so it throws the error at the correct location.  `#78 <https://github.com/sarugaku/shellingham/issues/78>`_
+
+
 1.5.2 (2023-08-16)
 ==================
 
