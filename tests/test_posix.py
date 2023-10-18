@@ -38,42 +38,40 @@ def environ(request):
     return manager
 
 
-MAPPING_EXAMPLE_KEEGANCSMITH = {
-    '1480': Process(pid='1480', ppid='1477', args=(
-        '/Applications/iTerm.app/Contents/MacOS/iTerm2',
-        '--server', 'login', '-fp', 'keegan',
-    )),
-    '1482': Process(pid='1482', ppid='1481', args=(
-        '-bash',
-    )),
-    '1556': Process(pid='1556', ppid='1482', args=(
-        'screen',
-    )),
-    '1558': Process(pid='1558', ppid='1557', args=(
-        '-/usr/local/bin/bash',
-    )),
-    '1706': Process(pid='1706', ppid='1558', args=(
-        '/Applications/Emacs.app/Contents/MacOS/Emacs-x86_64-10_10', '-nw',
-    )),
-    '77061': Process(pid='77061', ppid='1706', args=(
-        '/usr/local/bin/aspell', '-a', '-m', '-B', '--encoding=utf-8',
-    )),
-    '1562': Process(pid='1562', ppid='1557', args=(
-        '-/usr/local/bin/bash',
-    )),
-    '87033': Process(pid='87033', ppid='1557', args=(
-        '-/usr/local/bin/bash',
-    )),
-    '84732': Process(pid='84732', ppid='1557', args=(
-        '-/usr/local/bin/bash',
-    )),
-    '89065': Process(pid='89065', ppid='1557', args=(
-        '-/usr/local/bin/bash',
-    )),
-    '80216': Process(pid='80216', ppid='1557', args=(
-        '-/usr/local/bin/bash',
-    )),
-}
+MAPPING_EXAMPLE_KEEGANCSMITH = [
+    Process(
+        args=(
+            "/Applications/iTerm.app/Contents/MacOS/iTerm2",
+            "--server",
+            "login",
+            "-fp",
+            "keegan",
+        ),
+        pid="1480",
+        ppid="1477",
+    ),
+    Process(args=("-bash",), pid="1482", ppid="1481"),
+    Process(args=("screen",), pid="1556", ppid="1482"),
+    Process(args=("-/usr/local/bin/bash",), pid="1558", ppid="1557"),
+    Process(
+        args=(
+            "/Applications/Emacs.app/Contents/MacOS/Emacs-x86_64-10_10",
+            "-nw",
+        ),
+        pid="1706",
+        ppid="1558",
+    ),
+    Process(
+        args=("/usr/local/bin/aspell", "-a", "-m", "-B", "--encoding=utf-8"),
+        pid="77061",
+        ppid="1706",
+    ),
+    Process(args=("-/usr/local/bin/bash",), pid="1562", ppid="1557"),
+    Process(args=("-/usr/local/bin/bash",), pid="87033", ppid="1557"),
+    Process(args=("-/usr/local/bin/bash",), pid="84732", ppid="1557"),
+    Process(args=("-/usr/local/bin/bash",), pid="89065", ppid="1557"),
+    Process(args=("-/usr/local/bin/bash",), pid="80216", ppid="1557"),
+]
 
 
 @pytest.mark.parametrize('mapping, result', [
@@ -82,6 +80,6 @@ MAPPING_EXAMPLE_KEEGANCSMITH = {
     ),
 ])
 def test_get_shell(mocker, environ, mapping, result):
-    environ.patch(SHELL='==MOCKED=LOGIN=SHELL==/bash')
-    mocker.patch.object(posix, '_get_process_mapping', return_value=mapping)
+    environ.patch(SHELL="==MOCKED=LOGIN=SHELL==/bash")
+    mocker.patch.object(posix, "_iter_process_parents", return_value=mapping)
     assert posix.get_shell(pid=77061) == result
