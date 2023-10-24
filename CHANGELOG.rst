@@ -1,3 +1,12 @@
+1.5.4 (2023-10-24)
+==================
+
+Bug Fixes
+---------
+
+- Fix a bug that ``detect_shell()`` always returns the host shell on MacOS.  `#81 <https://github.com/sarugaku/shellingham/issues/81>`_
+
+
 1.5.3 (2023-08-17)
 ==================
 
