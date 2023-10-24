@@ -1,0 +1,1 @@
+Fix a bug that ``detect_shell()`` always returns the host shell on MacOS.
