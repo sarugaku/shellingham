@@ -32,6 +32,11 @@ jobs:
   publish:
     name: Publish release
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    environment:
+      name: publish
+      url: https://pypi.org/p/shellingham
     needs:
     - build
 
@@ -42,8 +47,6 @@ jobs:
         path: dist
 
     - name: Push build artifacts to PyPI
-      uses: pypa/gh-action-pypi-publish@v1.5.0
+      uses: pypa/gh-action-pypi-publish@v1.8.14
       with:
-        skip_existing: true
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        skip-existing: true
