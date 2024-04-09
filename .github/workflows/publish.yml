@@ -35,7 +35,7 @@ jobs:
     permissions:
       id-token: write
     environment:
-      name: pypi
+      name: publish
       url: https://pypi.org/p/shellingham
     needs:
     - build
