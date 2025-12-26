@@ -40,6 +40,14 @@ def _use_bsd_stat_format():
 
 
 def _get_ppid(pid, name):
+    # On sunos5 (illumos, Solaris) the /proc/pid/status file is a binary file
+    # which is hard to parse.  To get ppid we will just parse the ps(1) output.
+    if sys.platform == "sunos5":
+        import subprocess
+
+        return subprocess.check_output(
+            ["ps", "-o", "ppid", "-p", str(pid)], text=True
+        ).split("\n")[1]
     path = os.path.join("/proc", str(pid), name)
     with io.open(path, encoding="ascii", errors="replace") as f:
         parts = STAT_PATTERN.findall(f.read())
@@ -50,6 +58,19 @@ def _get_ppid(pid, name):
 
 
 def _get_cmdline(pid):
+    # sunos5 (illumos, Solaris) does not have /proc/pid/cmdline.
+    # Instead we will read and parse the pargs(1) output.
+    if sys.platform == "sunos5":
+        import subprocess
+
+        out = subprocess.check_output(
+            ["pargs", str(pid)], stderr=subprocess.DEVNULL, text=True
+        )
+        args = []
+        for line in out.split("\n"):
+            if line.startswith("argv["):
+                args.append(re.sub(r"^argv\[\d+\]: ", "", line))
+        return tuple(args)
     path = os.path.join("/proc", str(pid), "cmdline")
     encoding = sys.getfilesystemencoding() or "utf-8"
     with io.open(path, encoding=encoding, errors="replace") as f:
