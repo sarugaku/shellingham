@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install build dependencies
       run: python -m pip install --upgrade build
@@ -23,7 +23,7 @@ jobs:
     - name: Build
       run: python -m build
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v7
       with:
         name: artifacts
         path: dist/*
@@ -41,12 +41,12 @@ jobs:
     - build
 
     steps:
-    - uses: actions/download-artifact@v4.1.7
+    - uses: actions/download-artifact@v8.0.1
       with:
         name: artifacts
         path: dist
 
     - name: Push build artifacts to PyPI
-      uses: pypa/gh-action-pypi-publish@v1.8.14
+      uses: pypa/gh-action-pypi-publish@v1.13.0
       with:
         skip-existing: true
