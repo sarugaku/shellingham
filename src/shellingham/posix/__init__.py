@@ -7,7 +7,8 @@ from . import proc, ps
 # Based on QEMU docs: https://www.qemu.org/docs/master/user/main.html
 QEMU_BIN_REGEX = re.compile(
     r"""qemu-
-        (alpha
+        (aarch64
+        |alpha
         |armeb
         |arm
         |m68k
