@@ -32,3 +32,15 @@ showcontent = false
 directory = "removal"
 name = "Removals and Deprecations"
 showcontent = true
+
+
+[tool.mypy]
+files = "src"
+mypy_path = "src"
+namespace_packages = true
+
+[[tool.mypy.overrides]]
+module = [
+    "shellingham.nt"  # Mypy complains that ctypes has no windll on non-Windows machines
+]
+ignore_errors = true

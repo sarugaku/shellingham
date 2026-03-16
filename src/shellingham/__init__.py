@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import os
 
@@ -6,7 +8,15 @@ from ._core import ShellDetectionFailure
 __version__ = "1.5.4"
 
 
-def detect_shell(pid=None, max_depth=10):
+__all__ = [
+    "ShellDetectionFailure",
+    "detect_shell",
+]
+
+
+def detect_shell(
+    pid: int | None = None, max_depth: int = 10
+) -> tuple[int, int]:
     name = os.name
     try:
         impl = importlib.import_module(".{}".format(name), __name__)
