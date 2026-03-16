@@ -1,5 +1,39 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools >=70.0.0"]
+
+[project]
+name = "shellingham"
+description = "Tool to Detect Surrounding Shell"
+authors = [
+    { name = "Tzu-ping Chung", email = "uranusjr@gmail.com" }
+]
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = { file = "LICENSE" }
+keywords = ["shell"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: ISC License (ISCL)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">= 3.7"
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/sarugaku/shellingham"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 
 [tool.black]
 line-length = 79
