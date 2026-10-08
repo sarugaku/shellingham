@@ -1,0 +1,1 @@
+Respect the process-reported shell name when a login shell differs from ``$SHELL``.
