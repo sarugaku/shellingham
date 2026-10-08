@@ -83,3 +83,53 @@ def test_get_shell(mocker, environ, mapping, result):
     environ.patch(SHELL="==MOCKED=LOGIN=SHELL==/bash")
     mocker.patch.object(posix, "_iter_process_parents", return_value=mapping)
     assert posix.get_shell(pid=77061) == result
+
+
+@pytest.mark.parametrize('command, login_shell, result', [
+    ('-fish', '/bin/zsh', ('fish', 'fish')),
+    ('-/opt/homebrew/bin/fish', '/bin/zsh',
+     ('fish', '/opt/homebrew/bin/fish')),
+    ('-zsh', '/opt/homebrew/bin/fish', ('zsh', 'zsh')),
+    ('-bash', '/usr/local/bin/bash', ('bash', '/usr/local/bin/bash')),
+    ('-/bin/bash', '/usr/local/bin/bash', ('bash', '/usr/local/bin/bash')),
+    ('-BASH', '/usr/local/bin/bash', ('bash', '/usr/local/bin/bash')),
+    ('-bash', '/usr/local/bin/BASH', ('bash', '/usr/local/bin/BASH')),
+    ('-fish', None, ('fish', 'fish')),
+    ('-fish', '', ('fish', 'fish')),
+    ('/opt/homebrew/bin/fish', '/bin/zsh',
+     ('fish', '/opt/homebrew/bin/fish')),
+    ('-not-a-shell', '/bin/zsh', None),
+])
+def test_login_shell_matches_process(monkeypatch, command, login_shell, result):
+    if login_shell is None:
+        monkeypatch.delenv('SHELL', raising=False)
+    else:
+        monkeypatch.setenv('SHELL', login_shell)
+    mapping = [
+        Process(args=('python',), pid='2', ppid='1'),
+        Process(args=(command,), pid='1', ppid='0'),
+    ]
+    monkeypatch.setattr(posix, '_iter_process_parents', lambda *args: mapping)
+    assert posix.get_shell(pid=2) == result
+
+
+def test_login_shell_mismatch_continues_search(monkeypatch):
+    monkeypatch.setenv('SHELL', '/bin/zsh')
+    mapping = [
+        Process(args=('python',), pid='3', ppid='2'),
+        Process(args=('-not-a-shell',), pid='2', ppid='1'),
+        Process(args=('/bin/bash',), pid='1', ppid='0'),
+    ]
+    monkeypatch.setattr(posix, '_iter_process_parents', lambda *args: mapping)
+    assert posix.get_shell(pid=3) == ('bash', '/bin/bash')
+
+
+def test_login_shell_mismatch_checks_interpreter(monkeypatch):
+    monkeypatch.setenv('SHELL', '/bin/zsh')
+    mapping = [
+        Process(args=('python',), pid='2', ppid='1'),
+        Process(args=('-python3', '/usr/local/bin/xonsh'), pid='1', ppid='0'),
+    ]
+    monkeypatch.setattr(posix, '_iter_process_parents', lambda *args: mapping)
+    monkeypatch.setattr(posix.os.path, 'isfile', lambda path: True)
+    assert posix.get_shell(pid=2) == ('xonsh', '/usr/local/bin/xonsh')

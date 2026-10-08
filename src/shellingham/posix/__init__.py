@@ -50,13 +50,15 @@ def _iter_process_parents(pid, max_depth=10):
 
 
 def _get_login_shell(proc_cmd):
-    """Form shell information from SHELL environ if possible."""
+    """Use SHELL's full path when it matches the process-reported name."""
     login_shell = os.environ.get("SHELL", "")
-    if login_shell:
-        proc_cmd = login_shell
-    else:
-        proc_cmd = proc_cmd[1:]
-    return (os.path.basename(proc_cmd).lower(), proc_cmd)
+    if (
+        login_shell
+        and os.path.basename(login_shell).lower()
+        == os.path.basename(proc_cmd[1:]).lower()
+    ):
+        return (os.path.basename(login_shell).lower(), login_shell)
+    return None
 
 
 _INTERPRETER_SHELL_NAMES = [
@@ -85,8 +87,11 @@ def _get_interpreter_shell(proc_name, proc_args):
 
 
 def _get_shell(cmd, *args):
-    if cmd.startswith("-"):  # Login shell! Let's use this.
-        return _get_login_shell(cmd)
+    if cmd.startswith("-"):  # Login-style command.
+        shell = _get_login_shell(cmd)
+        if shell:
+            return shell
+        cmd = cmd[1:]
     name = os.path.basename(cmd).lower()
     if name == "rosetta" or QEMU_BIN_REGEX.fullmatch(name):
         # If the current process is Rosetta or QEMU, this likely is a
