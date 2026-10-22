@@ -91,6 +91,8 @@ def _get_shell(cmd, *args):
     if name == "rosetta" or QEMU_BIN_REGEX.fullmatch(name):
         # If the current process is Rosetta or QEMU, this likely is a
         # containerized process. Parse out the actual command instead.
+        if not args:
+            return None
         cmd = args[0]
         args = args[1:]
         name = os.path.basename(cmd).lower()
@@ -106,6 +108,8 @@ def get_shell(pid=None, max_depth=10):
     """Get the shell that the supplied pid or os.getpid() is running in."""
     pid = str(pid or os.getpid())
     for proc_args, _, _ in _iter_process_parents(pid, max_depth):
+        if not proc_args:
+            continue
         shell = _get_shell(*proc_args)
         if shell:
             return shell

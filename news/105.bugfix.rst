@@ -1,0 +1,2 @@
+Continue POSIX shell discovery past processes with empty command lines or
+QEMU/Rosetta command lines without a guest command.

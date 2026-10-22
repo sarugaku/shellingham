@@ -74,6 +74,27 @@ MAPPING_EXAMPLE_KEEGANCSMITH = [
 ]
 
 
+@pytest.mark.parametrize(
+    "args", [(), ("",), ("/usr/bin/qemu-x86_64",), ("/usr/bin/rosetta",)]
+)
+def test_get_shell_skips_empty_command(mocker, args):
+    mocker.patch(
+        "shellingham.posix._iter_process_parents",
+        return_value=iter(
+            [
+                Process(args=args, pid="2", ppid="1"),
+                Process(args=("/bin/bash",), pid="1", ppid="0"),
+            ]
+        ),
+    )
+    assert posix.get_shell(pid="2") == ("bash", "/bin/bash")
+
+
+@pytest.mark.parametrize("executable", ["/usr/bin/qemu-x86_64", "/usr/bin/rosetta"])
+def test_emulator_without_command(executable):
+    assert posix._get_shell(executable) is None
+
+
 @pytest.mark.parametrize('mapping, result', [
     (   # Based on pypa/pipenv#2496, provided by @keegancsmith.
         MAPPING_EXAMPLE_KEEGANCSMITH, ('bash', '==MOCKED=LOGIN=SHELL==/bash'),
